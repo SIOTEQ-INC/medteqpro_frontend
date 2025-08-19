@@ -1,16 +1,19 @@
+"use client";
+
 import React from "react";
 import { DataTable } from "@/components/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import { PatientType } from "./patient-data";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { PatientType } from "@/app/(Root)/admin/patients/_components/patient-data";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react"; // Using lucide-react for icons
-import Link from "next/link"; // Added Link import
+import { Edit } from "lucide-react";
+import Link from "next/link";
+import { useModule } from "@/hooks/useModule";
 
 interface PatientTableProps {
   data: PatientType[];
 }
 
-export const columns: ColumnDef<PatientType>[] = [
+const buildColumns = (getModulePath: (path: string) => string): ColumnDef<PatientType>[] => [
   {
     accessorKey: "patientId",
     header: "PATIENT ID",
@@ -70,10 +73,11 @@ export const columns: ColumnDef<PatientType>[] = [
   {
     id: "actions",
     header: "ACTION",
-    cell: ({ row }) => { // Changed to access row
+    cell: ({ row }) => {
       const patient = row.original;
+      const href = getModulePath(`/patients/${patient.patientId}`);
       return (
-        <Link href={`/doctor/patients/${patient.patientId}`}>
+        <Link href={href}>
           <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
             <Edit className="h-4 w-4" />
           </Button>
@@ -84,22 +88,24 @@ export const columns: ColumnDef<PatientType>[] = [
 ];
 
 const PatientTable: React.FC<PatientTableProps> = ({ data }) => {
+  const { getModulePath } = useModule();
+
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 10, // Default page size
+    pageSize: 10,
   });
 
   return (
     <DataTable
-      columns={columns}
+      columns={buildColumns(getModulePath)}
       data={data || []}
       options={{
         disableSelection: true,
         pagination: pagination,
         setPagination: setPagination,
-        manualPagination: false, // Assuming client-side pagination for now
+        manualPagination: false,
         totalCounts: data?.length || 0,
-        isLoading: false // Loading state is handled at the page level
+        isLoading: false,
       }}
     />
   );

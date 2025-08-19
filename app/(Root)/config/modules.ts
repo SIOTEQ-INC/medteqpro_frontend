@@ -17,7 +17,6 @@ import {
   Building,
   // UserPlus,
   Calendar,
-  Database,
   // Stethoscope,
   ShoppingCart,
 } from "lucide-react";
@@ -168,14 +167,14 @@ export const moduleConfigs: ModuleConfig[] = [
         href: "/patients",
       },
       {
-        label: "Medical Records",
-        icon: Database,
-        href: "/medical-records",
+        label: "Queuing System",
+        icon: Activity,
+        href: "/queuing-system",
       },
       {
-        label: "Write Prescription",
-        icon: Pill,
-        href: "/write-prescription",
+        label: "Wound Care",
+        icon: WoundCareIcon,
+        href: "/wound-care",
       },
     ],
     settingsItems: commonSettingsItems,
@@ -307,6 +306,35 @@ export const moduleConfigs: ModuleConfig[] = [
         label: "Laboratory",
         icon: FlaskConical,
         href: "/laboratory",
+      },
+      {
+        label: "Queuing System",
+        icon: Activity,
+        href: "/queuing-system",
+      },
+      {
+        label: "Appointment",
+        icon: Calendar,
+        href: "/appointment",
+      },
+    ],
+    settingsItems: commonSettingsItems,
+    defaultUserProfile: defaultUser,
+  },
+  {
+    key: "front-desk",
+    displayName: "Front Desk",
+    pathPrefix: "/front-desk",
+    menuItems: [
+      {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard",
+      },
+      {
+        label: "Patients",
+        icon: Users,
+        href: "/patients",
       },
       {
         label: "Queuing System",
