@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo } from "react";
-import Subheader from "../../_components/Subheader";
+import Subheader from "../../../../layouts/Subheader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "../../_components/StatCard";
+import { StatCard } from "../../../../layouts/StatCard";
 import { H3, Large, P, Small } from "@/components/ui/Typography";
 import {
   Pill,
@@ -15,7 +15,6 @@ import {
   Calendar,
 } from "lucide-react";
 import { getFormatCurrency } from "@/lib/utils";
-import SessionTimer from "../../admin/queuing-system/_components/SessionTimer";
 import {
   ChartContainer,
   ChartTooltip,
@@ -168,7 +167,7 @@ const PharmacyDashboard = () => {
             name: "Medteq Healthcare System",
           }}
         />
-        <Subheader title="Dashboard" middle={<SessionTimer />} />
+        <Subheader title="Dashboard"  />
         <div className="p-3 sm:p-6 space-y-3 sm:space-y-6 bg-gray-50 min-h-screen w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {[...Array(4)].map((_, i) => (

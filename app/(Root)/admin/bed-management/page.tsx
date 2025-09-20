@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/DataTable";
 import { bedColumns, BedData } from "./_components/columns";
-import Subheader from "../../_components/Subheader";
+import Subheader from "../../../../layouts/Subheader";
 import { BedStats } from "./_components/BedStats";
 import { TextInput } from "@/components/FormInputs/TextInput";
 import { SearchIcon } from "lucide-react";
@@ -163,11 +163,7 @@ const AdminBedManagementPage = () => {
       <div className="mb-6 p-6 flex gap-3 justify-end items-center">
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              variant={'ghost'}
-            >
-              Create Bed
-            </Button>
+            <Button variant={"ghost"}>Create Bed</Button>
           </DialogTrigger>
           <CreateBedDialog />
         </Dialog>
@@ -245,11 +241,13 @@ const AdminBedManagementPage = () => {
                   />
                 </div>
 
-                <DataTable
-                  columns={bedColumns(handleAssignBed)}
-                  data={filteredBedData}
-                  options={{ isLoading: isLoading || wardsLoading }}
-                />
+                <div className="w-full max-w-[76vw] bg-white p-2">
+                  <DataTable
+                    columns={bedColumns(handleAssignBed)}
+                    data={filteredBedData}
+                    options={{ isLoading: isLoading || wardsLoading }}
+                  />
+                </div>
               </div>
             </TabsContent>
           ))}
