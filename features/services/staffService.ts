@@ -70,6 +70,14 @@ export interface UpdateStaffWorkStatusPayload {
   end_date?: string;
 }
 
+// Current work status response shape
+export interface StaffWorkStatus {
+  status: "active" | "inactive" | "on_leave" | "suspended";
+  reason?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+}
+
 // Hook for fetching staff list
 export const useStaffList = (params?: StaffListParams) => {
   const queryParams = new URLSearchParams();
@@ -138,6 +146,76 @@ export const useStaffForAppointment = () => {
   });
 };
 
+// =====================
+// Staff Permissions
+// =====================
+
+export type StaffPermissionRole =
+  | "doctor"
+  | "nurse"
+  | "front_desk"
+  | "lab_scientist"
+  | "pharmacist"
+  | "admin";
+
+export type PermissionCategory =
+  | "create_patient"
+  | "patient"
+  | "wound_care"
+  | "opa_record"
+  | "bed_management"
+  | "staff_management"
+  | "payroll_management"
+  | "lab_result"
+  | "laboratory"
+  | "lab_draft"
+  | "pickup"
+  | "internal_pharmacy"
+  | "queuing_system"
+  | "appointment";
+
+export interface StaffPermissions {
+  id: string; // staff id
+  role: StaffPermissionRole;
+  permissions: Record<PermissionCategory, boolean>;
+}
+
+/**
+ * Fetch current permissions for a staff member.
+ * API path follows existing hospital-admin convention used elsewhere in the app.
+ */
+export const useGetStaffPermissions = (staffId: string) => {
+  return useQuery<ApiResponse<StaffPermissions>, ApiResponseError>({
+    queryKey: ["staff-permissions", staffId],
+    queryFn: async () =>
+      await getRequest({ url: `/hospital-admin/staff/${staffId}/permissions/` }),
+    enabled: !!staffId,
+    refetchOnWindowFocus: false,
+  });
+};
+
+/**
+ * Update permissions for a staff member.
+ */
+export const useUpdateStaffPermissions = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiResponse<StaffPermissions>,
+    ApiResponseError,
+    { staffId: string; payload: { permissions: Record<PermissionCategory, boolean> } }
+  >({
+    mutationKey: ["update-staff-permissions"],
+    mutationFn: async ({ staffId, payload }) =>
+      await patchRequest({
+        url: `/hospital-admin/staff/${staffId}/permissions/`,
+        payload,
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["staff-permissions", variables.staffId] });
+    },
+  });
+};
+
 // Hook for creating hospital staff
 export const useCreateHospitalStaff = () => {
   const queryClient = useQueryClient();
@@ -198,6 +276,17 @@ export const useUpdateStaffWorkStatus = () => {
       // Invalidate and refetch hospital staff list
       queryClient.invalidateQueries({ queryKey: ["hospital-staff-list"] });
     },
+  });
+};
+
+// Hook to fetch current staff work status
+export const useGetStaffWorkStatus = (staffId: string) => {
+  return useQuery<ApiResponse<StaffWorkStatus>, ApiResponseError>({
+    queryKey: ["staff-work-status", staffId],
+    queryFn: async () =>
+      await getRequest({ url: `/hospital-admin/staff/${staffId}/work-status/` }),
+    enabled: !!staffId,
+    refetchOnWindowFocus: false,
   });
 };
 
