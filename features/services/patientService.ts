@@ -2,7 +2,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getRequest, postRequest } from "@/lib/axiosInstance";
+import { getRequest, postRequest, patchRequest } from "@/lib/axiosInstance";
 import { ApiResponse, ApiResponseError } from "@/types";
 import type { PatientDetailResponse } from "@/features/pages/patients/patient-details/_components/types";
 import { useUser } from "@/store/authSlice";
@@ -25,6 +25,7 @@ export interface PatientListParams {
   start_date?: string;
   end_date?: string;
   patient_type?: string;
+  family_id?: string; // Added to support filtering by family
 }
 
 export interface PatientQrcode {
@@ -48,6 +49,7 @@ export const usePatientList = (params?: PatientListParams) => {
       if (params?.end_date) queryParams.push(`end_date=${params.end_date}`);
       if (params?.patient_type)
         queryParams.push(`patient_type=${params.patient_type}`);
+      if (params?.family_id) queryParams.push(`family_id=${params.family_id}`);
 
       if (queryParams.length > 0) {
         url += `?${queryParams.join("&")}`;
@@ -236,6 +238,35 @@ export const useCreateFamily = () => {
     onSuccess: () => {
       // Refresh families list after create
       queryClient.invalidateQueries({ queryKey: ["families"] });
+    },
+  });
+};
+
+// Assign existing patients to a family by updating their family_id
+export interface AssignPatientsToFamilyPayload {
+  familyId: string;
+  patientIds: string[];
+}
+
+export const useAssignPatientsToFamily = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<any[], ApiResponseError, AssignPatientsToFamilyPayload>({
+    mutationFn: async ({ familyId, patientIds }) => {
+      const results = await Promise.all(
+        patientIds.map((pid) =>
+          patchRequest<{ family_id: string }>({
+            url: `patient-management/patients/${pid}/`,
+            payload: { family_id: familyId },
+          })
+        )
+      );
+      return results.map((r) => r.data);
+    },
+    onSuccess: () => {
+      // Refresh families and patients lists after assignment
+      queryClient.invalidateQueries({ queryKey: ["families"] });
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
     },
   });
 };
